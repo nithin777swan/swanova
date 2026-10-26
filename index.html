@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101426">
+<title>BrainQuest — Play. Learn. Level Up.</title>
+<style>
+:root{--bg:#0c1020;--panel:#151b31;--panel2:#1c2440;--text:#f4f6ff;--muted:#aab3d0;--accent:#8b7cff;--cyan:#51e0d0;--yellow:#ffd166;--red:#ff7185;--line:#2b3455}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#25245a 0,#0c1020 42%);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);min-height:100vh}
+button,select{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:750;transition:transform .15s,filter .15s}button:hover{filter:brightness(1.1);transform:translateY(-1px)}button:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.primary{background:linear-gradient(135deg,var(--accent),#6255e8);color:white}.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.small{padding:8px 11px;font-size:.9rem}
+header{max-width:1120px;margin:auto;padding:24px 20px 10px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--accent));display:grid;place-items:center;font-size:24px;color:#101426;font-weight:900}.brand h1{font-size:1.2rem;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:.85rem}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.pill{background:#171d34;border:1px solid var(--line);border-radius:999px;padding:9px 13px;font-weight:750;font-size:.9rem}
+main{max-width:1120px;margin:auto;padding:16px 20px 40px}.hero{padding:28px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(115deg,rgba(139,124,255,.18),rgba(81,224,208,.07)),var(--panel);display:grid;grid-template-columns:1.5fr .8fr;gap:20px;align-items:center}
+.eyebrow{color:var(--cyan);text-transform:uppercase;letter-spacing:.14em;font-weight:850;font-size:.75rem}.hero h2{font-size:clamp(2rem,5vw,3.3rem);line-height:1.03;margin:10px 0 14px;letter-spacing:-.04em}.hero p{color:var(--muted);max-width:580px;line-height:1.65}.hero-art{font-size:clamp(5rem,12vw,8rem);text-align:center;filter:drop-shadow(0 12px 28px #6b5bff55)}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 0 14px}.section-head h2{margin:0;font-size:1.3rem}.section-head p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.feature{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;min-height:190px;display:flex;flex-direction:column;align-items:flex-start}.feature .emoji{font-size:2rem;margin-bottom:12px}.feature h3{margin:0 0 7px}.feature p{color:var(--muted);font-size:.9rem;line-height:1.5;margin:0 0 16px;flex:1}.feature button{width:100%}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:20px}.panel h2{margin:0 0 6px}.muted{color:var(--muted)}.progress-track{height:10px;background:#2a3150;border-radius:99px;overflow:hidden;margin:12px 0}.progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--accent));width:0%;transition:width .25s}
+.activity-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.activity-row:last-child{border-bottom:0}.badge-list{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.badge-item{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:120px}.badge-item span{font-size:1.5rem;display:block}.badge-item small{color:var(--muted)}.locked{opacity:.42;filter:grayscale(1)}
+#playArea{display:none}.play-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.question{font-size:1.35rem;font-weight:800;margin:22px 0}.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}.answer{background:var(--panel2);color:var(--text);border:1px solid var(--line);text-align:left;min-height:56px}.answer.correct{border-color:var(--cyan);background:#123a3a}.answer.wrong{border-color:var(--red);background:#402332}.feedback{min-height:28px;margin:14px 0;color:var(--cyan);font-weight:700}.game-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+select{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:10px 20px 28px}
+.hidden{display:none!important}
+@media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr}.hero-art{display:none}}
+@media(max-width:480px){header{padding:18px 14px}.stats{width:100%}.pill{flex:1;text-align:center;font-size:.8rem}main{padding:12px 14px 30px}.hero{padding:22px}.cards{grid-template-columns:1fr}.feature{min-height:unset}.answers{grid-template-columns:1fr}.panel{padding:17px}.section-head{align-items:start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">B</div><div><h1>BrainQuest</h1><p>Play. Learn. Level Up.</p></div></div>
+  <div class="stats">
+    <div class="pill">⚡ <span id="xp">0</span> XP</div>
+    <div class="pill">🏆 Level <span id="level">1</span></div>
+    <div class="pill">🔥 <span id="streak">0</span> correct</div>
+  </div>
+</header>
+<main>
+  <section id="homeView">
+    <div class="hero">
+      <div><div class="eyebrow">Your learning adventure starts here</div><h2>Make learning<br>your superpower.</h2><p>Answer quick questions, play the challenge game, earn XP, and revisit questions you missed. Your progress is saved on this device.</p><button class="primary" onclick="startQuiz()">Start a quiz →</button></div>
+      <div class="hero-art" aria-hidden="true">🧠🚀</div>
+    </div>
+    <div class="section-head"><div><h2>Choose your challenge</h2><p>Short rounds. Real learning. No downloads.</p></div></div>
+    <div class="cards">
+      <article class="feature"><div class="emoji">🎯</div><h3>Quiz Arena</h3><p>Test your knowledge in science, maths, and general knowledge.</p><button class="primary" onclick="startQuiz()">Play quiz</button></article>
+      <article class="feature"><div class="emoji">🪐</div><h3>Learn & Survive</h3><p>Answer correctly to keep your mission going. Three mistakes end the run.</p><button class="primary" onclick="startGame()">Start mission</button></article>
+      <article class="feature"><div class="emoji">🔁</div><h3>Smart Revision</h3><p>Retry questions you answered incorrectly in previous rounds.</p><button class="secondary" onclick="startRevision()">Revise mistakes</button></article>
+      <article class="feature"><div class="emoji">🏅</div><h3>Achievements</h3><p>Earn milestones as you practise and build your XP total.</p><button class="secondary" onclick="showAchievements()">View badges</button></article>
+    </div>
+    <div class="panel">
+      <h2>Your progress</h2><p class="muted">Level up every 100 XP.</p>
+      <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+      <div class="activity-row"><span>XP to next level</span><strong id="nextXP">100 XP</strong></div>
+      <div class="activity-row"><span>Questions answered</span><strong id="answered">0</strong></div>
+      <div class="activity-row"><span>Correct answers</span><strong id="correctTotal">0</strong></div>
+      <div class="activity-row"><span>Accuracy</span><strong id="accuracy">—</strong></div>
+    </div>
+    <div class="panel" id="achievementsPanel">
+      <h2>🏅 Achievements</h2><p class="muted">Unlock badges by practising.</p><div id="badgeList" class="badge-list"></div>
+    </div>
+  </section>
+  <section id="playArea" class="panel">
+    <div class="play-top"><div><div class="eyebrow" id="modeLabel">QUIZ ARENA</div><h2 id="playTitle">Ready?</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="subjectSelect" aria-label="Choose subject" onchange="changeSubject()"><option value="All">All subjects</option><option value="Science">Science</option><option value="Maths">Maths</option><option value="General Knowledge">General knowledge</option></select><button class="secondary small" onclick="goHome()">← Home</button></div></div>
+    <div class="progress-track"><div id="roundProgress" class="progress-fill"></div></div>
+    <div class="muted" id="questionCounter">Question 1</div>
+    <div class="question" id="questionText"></div>
+    <div id="answerButtons" class="answers"></div>
+    <div id="feedback" class="feedback" aria-live="polite"></div>
+    <div class="game-actions"><button id="nextButton" class="primary hidden" onclick="nextQuestion()">Next question →</button><button id="endButton" class="secondary hidden" onclick="finishRound()">Finish round</button></div>
+  </section>
+</main>
+<footer>BrainQuest demo • Free to use • Progress is stored locally in this browser</footer>
+<script>
+const questions = [
+ {s:"Science",q:"Which organelle is known as the powerhouse of the cell?",a:["Nucleus","Mitochondrion","Ribosome","Golgi body"],c:1,e:"Mitochondria release usable energy through cellular respiration."},
+ {s:"Science",q:"What is the SI unit of force?",a:["Joule","Watt","Newton","Pascal"],c:2,e:"Force is measured in newtons (N)."},
+ {s:"Science",q:"Which gas do plants absorb during photosynthesis?",a:["Oxygen","Nitrogen","Carbon dioxide","Hydrogen"],c:2,e:"Plants use carbon dioxide and water to make sugars using light energy."},
+ {s:"Science",q:"What is the centre of an atom called?",a:["Electron","Nucleus","Shell","Molecule"],c:1,e:"The nucleus contains protons and neutrons."},
+ {s:"Science",q:"Which blood cells help the body fight infection?",a:["Red blood cells","Platelets","White blood cells","Plasma"],c:2,e:"White blood cells are part of the immune system."},
+ {s:"Science",q:"At standard atmospheric pressure, water boils at what temperature?",a:["50°C","100°C","150°C","200°C"],c:1,e:"Water boils at 100°C at standard atmospheric pressure."},
+ {s:"Maths",q:"What is 12 × 8?",a:["86","92","96","108"],c:2,e:"12 × 8 = 96."},
+ {s:"Maths",q:"What is the square root of 144?",a:["10","11","12","14"],c:2,e:"12 × 12 = 144."},
+ {s:"Maths",q:"If x + 7 = 19, what is x?",a:["10","11","12","13"],c:2,e:"Subtract 7 from both sides: x = 12."},
+ {s:"Maths",q:"What is the sum of the angles in a triangle?",a:["90°","180°","270°","360°"],c:1,e:"The interior angles of a triangle add up to 180°."},
+ {s:"Maths",q:"What is 3/4 expressed as a percentage?",a:["25%","50%","75%","80%"],c:2,e:"3 ÷ 4 = 0.75 = 75%."},
+ {s:"Maths",q:"What is 2⁵?",a:["10","16","25","32"],c:3,e:"2⁵ = 2 × 2 × 2 × 2 × 2 = 32."},
+ {s:"General Knowledge",q:"What is the capital of Karnataka?",a:["Mysuru","Mangaluru","Bengaluru","Hubballi"],c:2,e:"Bengaluru is the capital of Karnataka."},
+ {s:"General Knowledge",q:"Which is the largest planet in our solar system?",a:["Earth","Saturn","Jupiter","Neptune"],c:2,e:"Jupiter is the largest planet in our solar system."},
+ {s:"General Knowledge",q:"How many days are there in a leap year?",a:["364","365","366","367"],c:2,e:"A leap year has 366 days."},
+ {s:"General Knowledge",q:"Which ocean is the largest?",a:["Atlantic","Indian","Arctic","Pacific"],c:3,e:"The Pacific Ocean is the largest ocean on Earth."},
+ {s:"General Knowledge",q:"Which instrument is used to measure temperature?",a:["Barometer","Thermometer","Ammeter","Compass"],c:1,e:"A thermometer measures temperature."},
+ {s:"General Knowledge",q:"How many sides does a hexagon have?",a:["5","6","7","8"],c:1,e:"A hexagon has six sides."}
+];
+const defaultState={xp:0,answered:0,correct:0,streak:0,bestStreak:0,wrong:[],badges:[]};
+let state;
+try{state={...defaultState,...JSON.parse(localStorage.getItem("brainquest-state")||"{}")}}catch(e){state={...defaultState}}
+let mode="quiz", pool=[], index=0, roundCorrect=0, mistakes=0, locked=false, selectedSubject="All";
+const $=id=>document.getElementById(id);
+function save(){try{localStorage.setItem("brainquest-state",JSON.stringify(state))}catch(e){};updateStats()}
+function updateStats(){
+ $("xp").textContent=state.xp;$("level").textContent=Math.floor(state.xp/100)+1;$("streak").textContent=state.streak;
+ $("answered").textContent=state.answered;$("correctTotal").textContent=state.correct;
+ $("accuracy").textContent=state.answered?Math.round(state.correct/state.answered*100)+"%":"—";
+ const inLevel=state.xp%100;$("progressFill").style.width=inLevel+"%";$("nextXP").textContent=(100-inLevel)+" XP";
+ const badges=[["🌱","First Steps",state.answered>=1,"Answer your first question"],["🎯","Sharp Shooter",state.correct>=10,"Get 10 answers correct"],["⚡","XP Collector",state.xp>=100,"Earn 100 XP"],["🔥","On a Roll",state.bestStreak>=5,"Get 5 correct in a row"],["🧠","Dedicated Learner",state.answered>=25,"Answer 25 questions"]];
+ $("badgeList").innerHTML=badges.map(b=>`<div class="badge-item ${b[2]?"":"locked"}"><span>${b[0]}</span><strong>${b[1]}</strong><br><small>${b[2]?"Unlocked":b[3]}</small></div>`).join("");
+}
+function showPlay(label,title){$("homeView").classList.add("hidden");$("playArea").style.display="block";$("modeLabel").textContent=label;$("playTitle").textContent=title;window.scrollTo({top:0,behavior:"smooth"})}
+function goHome(){$("playArea").style.display="none";$("homeView").classList.remove("hidden");updateStats();window.scrollTo({top:0,behavior:"smooth"})}
+function shuffle(arr){return arr.slice().sort(()=>Math.random()-.5)}
+function startQuiz(){mode="quiz";selectedSubject=$("subjectSelect").value;pool=makePool(false);beginRound("QUIZ ARENA","Quiz Arena")}
+function startGame(){mode="game";selectedSubject=$("subjectSelect").value;pool=makePool(false);mistakes=0;beginRound("LEARN & SURVIVE","Mission: Knowledge")}
+function startRevision(){mode="revision";selectedSubject="All";$("subjectSelect").value="All";pool=state.wrong.map(w=>questions[w]).filter(Boolean);if(!pool.length){showPlay("SMART REVISION","No mistakes to revise yet");$("questionCounter").textContent="";$("questionText").textContent="Answer some questions first. Any mistakes will appear here."; $("answerButtons").innerHTML="";$("feedback").textContent="";$("nextButton").classList.add("hidden");$("endButton").classList.add("hidden");return}pool=shuffle(pool);beginRound("SMART REVISION","Fix Your Mistakes")}
+function makePool(revision){let list=questions.map((q,i)=>({...q,original:i}));if(selectedSubject!=="All")list=list.filter(q=>q.s===selectedSubject);return shuffle(list).slice(0,Math.min(10,list.length))}
+function beginRound(label,title){index=0;roundCorrect=0;locked=false;showPlay(label,title);renderQuestion()}
+function changeSubject(){selectedSubject=$("subjectSelect").value;if(mode==="quiz")startQuiz();else if(mode==="game")startGame()}
+function renderQuestion(){
+ locked=false;$("feedback").textContent="";$("nextButton").classList.add("hidden");$("endButton").classList.add("hidden");
+ if(index>=pool.length){finishRound();return}
+ const q=pool[index];$("questionCounter").textContent=`Question ${index+1} of ${pool.length} • ${q.s}`;$("roundProgress").style.width=(index/pool.length*100)+"%";$("questionText").textContent=q.q;
+ $("answerButtons").innerHTML=q.a.map((a,i)=>`<button class="answer" onclick="chooseAnswer(${i})">${String.fromCharCode(65+i)}. ${a}</button>`).join("");
+ if(mode==="game")$("questionCounter").textContent+=` • Mistakes: ${mistakes}/3`;
+}
+function chooseAnswer(choice){
+ if(locked)return;locked=true;const q=pool[index];const buttons=[...$("answerButtons").querySelectorAll("button")];buttons.forEach(b=>b.disabled=true);
+ buttons[q.c].classList.add("correct");state.answered++;
+ if(choice===q.c){state.correct++;state.xp+=10;state.streak++;state.bestStreak=Math.max(state.bestStreak,state.streak);roundCorrect++;$("feedback").textContent="Correct! +10 XP. "+q.e}
+ else{state.streak=0;if(mode==="game")mistakes++;$("feedback").textContent="Not quite. "+q.e;buttons[choice].classList.add("wrong");const original=q.original!==undefined?q.original:questions.findIndex(x=>x.q===q.q);if(original>=0&&!state.wrong.includes(original))state.wrong.push(original)}
+ save();$("roundProgress").style.width=((index+1)/pool.length*100)+"%";
+ if(mode==="game"&&mistakes>=3){$("feedback").textContent+=" Mission ended — 3 mistakes used.";$("nextButton").classList.add("hidden");$("endButton").classList.remove("hidden");$("endButton").textContent="See results";return}
+ if(index===pool.length-1){$("nextButton").classList.add("hidden");$("endButton").classList.remove("hidden");$("endButton").textContent="See results"}else{$("nextButton").classList.remove("hidden")}
+}
+function nextQuestion(){index++;renderQuestion()}
+function finishRound(){
+ const total=index+(locked?1:0);const accuracy=total?Math.round(roundCorrect/total*100):0;
+ $("modeLabel").textContent="ROUND COMPLETE";$("playTitle").textContent=mode==="game"&&mistakes>=3?"Mission ended":"Round complete!";
+ $("questionCounter").textContent="Your result";$("questionText").textContent=`You got ${roundCorrect} correct. Accuracy: ${accuracy}%.`;
+ $("answerButtons").innerHTML=`<div class="badge-item"><span>⚡</span><strong>${roundCorrect*10} XP</strong><br><small>Earned this round</small></div><div class="badge-item"><span>🎯</span><strong>${roundCorrect}/${Math.max(total, pool.length)}</strong><br><small>Correct answers</small></div>`;
+ $("feedback").textContent="Keep practising to improve your score.";$("nextButton").classList.add("hidden");$("endButton").classList.add("hidden");$("roundProgress").style.width="100%";
+ const homeBtn=document.createElement("button");homeBtn.className="primary";homeBtn.textContent="Back to dashboard";homeBtn.onclick=goHome;$("answerButtons").appendChild(homeBtn);
+ const retry=document.createElement("button");retry.className="secondary";retry.textContent="Play again";retry.onclick=()=>mode==="revision"?startRevision():mode==="game"?startGame():startQuiz();$("answerButtons").appendChild(retry);save();
+}
+function showAchievements(){ $("achievementsPanel").scrollIntoView({behavior:"smooth",block:"center"})}
+updateStats();
+</script>
+</body>
+</html>
