@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NITHIN Chess Arena | Swanova</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #101522;
+      color: white;
+      text-align: center;
+    }
+
+    header { margin-bottom: 20px; }
+
+    .brand {
+      color: #f5c76b;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .subtitle { color: #aeb8cc; margin-top: 8px; }
+
+    .panel {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px;
+      background: #1b2435;
+      border-radius: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-weight: bold;
+      background: #f5c76b;
+      color: #171717;
+    }
+
+    button.secondary {
+      background: #344158;
+      color: white;
+    }
+
+    #status {
+      min-height: 24px;
+      margin: 12px 0;
+      font-weight: bold;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      width: 100%;
+      max-width: 440px;
+      margin: auto;
+      border: 4px solid #344158;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .square {
+      aspect-ratio: 1;
+      padding: 0;
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: clamp(25px, 7vw, 45px);
+      line-height: 1;
+    }
+
+    .light { background: #f0d9b5; }
+    .dark { background: #b58863; }
+
+    .selected { box-shadow: inset 0 0 0 4px #facc15; }
+
+    .target::after {
+      content: "";
+      position: absolute;
+      width: 24%;
+      height: 24%;
+      border-radius: 50%;
+      background: #267443;
+      opacity: 0.8;
+    }
+
+    .white-piece {
+      color: #fffdf4;
+      text-shadow: 1px 2px 2px #222;
+    }
+
+    .black-piece {
+      color: #171717;
+      text-shadow: 0 1px 1px #fff;
+    }
+
+    .note {
+      color: #bdc7d9;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    a { color: #f5c76b; }
+
+    footer {
+      margin-top: 22px;
+      color: #aeb8cc;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">♟ NITHIN CHESS ARENA</div>
+    <div class="subtitle">Powered by Swanova — Rise Through Knowledge</div>
+  </header>
+
+  <main class="panel">
+    <div class="buttons">
+      <button id="computerBtn">Play Computer</button>
+      <button id="friendsBtn" class="secondary">Play Friends Online</button>
+      <button id="restartBtn" class="secondary">New Game</button>
+    </div>
+
+    <div id="status">Loading chess game...</div>
+    <div id="board" aria-label="Chessboard"></div>
+    <div class="note" id="message">
+      Select a piece, then select a highlighted destination.
+    </div>
+  </main>
+
+  <footer>
+    Created by NITHIN · Swanova
+  </footer>
+
+  <script>
+    const boardElement = document.getElementById("board");
+    const statusElement = document.getElementById("status");
+    const messageElement = document.getElementById("message");
+
+    const chess = new Chess();
+
+    const symbols = {
+      wK: "♔", wQ: "♕", wR: "♖",
+      wB: "♗", wN: "♘", wP: "♙",
+      bK: "♚", bQ: "♛", bR: "♜",
+      bB: "♝", bN: "♞", bP: "♟"
+    };
+
+    let selected = null;
+    let legalMoves = [];
+    let mode = "computer";
+    let computerThinking = false;
+
+    function renderBoard() {
+      boardElement.innerHTML = "";
+
+      const files = "abcdefgh";
+
+      for (let rank = 8; rank >= 1; rank--) {
+        for (let file = 0; file < 8; file++) {
+          const square = files[file] + rank;
+          const piece = chess.get(square);
+          const button = document.createElement("button");
+
+          button.className = "square " +
+            ((rank + file) % 2 === 0 ? "light" : "dark");
+
+          button.setAttribute("aria-label", square);
+
+          if (piece) {
+            button.textContent =
+              symbols[piece.color + piece.type.toUpperCase()];
+            button.classList.add(
+              piece.color === "w" ? "white-piece" : "black-piece"
+            );
+          }
+
+          if (selected === square) {
+            button.classList.add("selected");
+          }
+
+          if (legalMoves.some(move => move.to === square)) {
+            button.classList.add("target");
+          }
+
+          button.addEventListener("click", () => handleSquare(square));
+          boardElement.appendChild(button);
+        }
+      }
+
+      updateStatus();
+    }
+
+    function updateStatus() {
+      if (chess.in_checkmate()) {
+        statusElement.textContent =
+          "Checkmate! " +
+          (chess.turn() === "w" ? "Black" : "White") + " wins.";
+      } else if (chess.in_stalemate()) {
+        statusElement.textContent = "Draw — stalemate.";
+      } else if (chess.in_draw()) {
+        statusElement.textContent = "Game drawn.";
+      } else {
+        statusElement.textContent =
+          (chess.turn() === "w" ? "White" : "Black") +
+          " to move" + (chess.in_check() ? " — CHECK!" : "");
+      }
+    }
+
+    function handleSquare(square) {
+      if (chess.game_over() || computerThinking) return;
+      if (mode === "computer" && chess.turn() === "b") return;
+
+      const piece = chess.get(square);
+
+      if (selected &&
+          legalMoves.some(move => move.to === square)) {
+        makeMove(selected, square);
+        return;
+      }
+
+      if (piece && piece.color === chess.turn()) {
+        selected = square;
+        legalMoves = chess.moves({
+          square: square,
+          verbose: true
+        });
+      } else {
+        selected = null;
+        legalMoves = [];
+      }
+
+      renderBoard();
+    }
+
+    function makeMove(from, to) {
+      const result = chess.move({
+        from: from,
+        to: to,
+        promotion: "q"
+      });
+
+      selected = null;
+      legalMoves = [];
+
+      if (result) {
+        renderBoard();
+
+        if (mode === "computer" && !chess.game_over()) {
+          computerThinking = true;
+          messageElement.textContent = "Computer is thinking...";
+
+          setTimeout(computerMove, 500);
+        }
+      }
+    }
+
+    function computerMove() {
+      if (chess.game_over()) {
+        computerThinking = false;
+        renderBoard();
+        return;
+      }
+
+      const moves = chess.moves({ verbose: true });
+      if (moves.length > 0) {
+        const move = moves[Math.floor(Math.random() * moves.length)];
+
+        chess.move({
+          from: move.from,
+          to: move.to,
+          promotion: "q"
+        });
+      }
+
+      computerThinking = false;
+      renderBoard();
+      messageElement.textContent =
+        "Select your next piece to continue.";
+    }
+
+    document.getElementById("computerBtn").onclick = () => {
+      mode = "computer";
+      resetGame();
+      messageElement.textContent =
+        "You play White. The computer plays Black.";
+    };
+
+    document.getElementById("friendsBtn").onclick = () => {
+      messageElement.textContent =
+        "Online play is not connected yet. We will add room codes and " +
+        "real-time multiplayer in the next development step.";
+    };
+
+    document.getElementById("restartBtn").onclick = resetGame;
+
+    function resetGame() {
+      chess.reset();
+      selected = null;
+      legalMoves = [];
+      computerThinking = false;
+      renderBoard();
+      messageElement.textContent = mode === "computer"
+        ? "You play White. The computer plays Black."
+        : "Local game restarted.";
+    }
+
+    if (typeof Chess === "undefined") {
+      statusElement.textContent = "Chess library did not load.";
+      messageElement.textContent =
+        "Check your internet connection and reload the page.";
+    } else {
+      renderBoard();
+      messageElement.textContent =
+        "You play White. The computer plays Black.";
+    }
+  </script>
+</body>
+</html>
